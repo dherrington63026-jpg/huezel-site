@@ -102,6 +102,7 @@
   <div id="menuBoost"></div>
   <div class="row">
     <button class="chip" id="tSound">Sound: on</button>
+    <button class="chip" id="tGap">Finger gap: normal</button>
     <button class="chip" id="tMusic">Music: on</button>
     <button class="chip" id="tMStyle">Music style: auto</button>
     <button class="chip" id="tGfx">Graphics: auto</button>
@@ -306,7 +307,9 @@
 /* ============ constants ============ */
 const LW=720, LH=1280, BX=40, BY=262;
 let N=8, CELL=80;
-const TRAY_Y=1075, TRAY_CELL=40, LIFT=120, FGAP=70;
+const TRAY_Y=1075, TRAY_CELL=40, LIFT=120, FGAPS={close:20,normal:70,far:110};
+let FGAPK="normal";try{const k=localStorage.getItem("hz_fgap");if(FGAPS[k])FGAPK=k}catch(e){}
+let FGAP=FGAPS[FGAPK];
 const COLORS=[
  {name:"red",   light:"#ff9aa9", base:"#ff3d5a", dark:"#a8123a", glow:"255,61,90",  emoji:"🟥"},
  {name:"blue",  light:"#92d2ff", base:"#2f7bff", dark:"#173d9e", glow:"47,123,255", emoji:"🟦"},
@@ -1529,13 +1532,14 @@ $("tGfx").onclick=()=>{GFX=GFX==="auto"?"high":GFX==="high"?"low":"auto";store("
 $("tMusic").onclick=()=>{opt.music=!opt.music;store("hz_music",opt.music?"1":"0");syncOpts();if(opt.music)musicStart();else musicStop()};
 $("tVibe").onclick=()=>{opt.vibe=!opt.vibe;store("hz_vibe",opt.vibe?"1":"0");syncOpts();if(opt.vibe){vib([120,60,120]);if(!canVibe())toast("This phone or browser does not allow vibration")}};
 $("tMStyle").onclick=()=>{const L=MSTYLES.concat(MUSIC_PACKS.filter(m=>isOwned(m.id)).map(m=>m.id)),i=L.indexOf(opt.mstyle);opt.mstyle=L[(i+1)%L.length];store("hz_mstyle",opt.mstyle);syncOpts()};
+$("tGap").onclick=()=>{const ks=["close","normal","far"];FGAPK=ks[(ks.indexOf(FGAPK)+1)%3];FGAP=FGAPS[FGAPK];store("hz_fgap",FGAPK);syncOpts();toast("Finger gap: "+FGAPK+(FGAPK==="close"?" (block sits just above your finger)":FGAPK==="far"?" (block floats well above your finger)":""))};
 $("tSound").onclick=()=>{opt.sound=!opt.sound;store("hz_sound",opt.sound?"1":"0");syncOpts();if(opt.sound)sfx.pick()};
 $("tCB").onclick=()=>{opt.cb=!opt.cb;store("hz_cb",opt.cb?"1":"0");syncOpts()};
 function syncOpts(){$("tGfx").textContent="Graphics: "+GFX;
   $("tMStyle").textContent="Music style: "+(opt.mstyle==="auto"?"random each level":((MUSIC_PACKS.find(m=>m.id===opt.mstyle)||{name:opt.mstyle}).name));$("tMStyle").classList.toggle("off",!opt.music);
   $("tVibe").textContent="Vibrate: "+(opt.vibe?(canVibe()?"on":"on (not supported here)"):"off");$("tVibe").classList.toggle("off",!opt.vibe);
   $("tMusic").textContent="Music: "+(opt.music?"on":"off");$("tMusic").classList.toggle("off",!opt.music);
-  $("tSound").textContent="Sound: "+(opt.sound?"on":"off");$("tSound").classList.toggle("off",!opt.sound);
+  $("tGap").textContent="Finger gap: "+FGAPK;  $("tSound").textContent="Sound: "+(opt.sound?"on":"off");$("tSound").classList.toggle("off",!opt.sound);
   $("tCB").textContent="Color-blind symbols: "+(opt.cb?"on":"off");$("tCB").classList.toggle("off",!opt.cb)}
 $("bChal").onclick=async()=>{const name=($("nameIn").value||"").replace(/[^\w \-']/g,"").trim().slice(0,14)||"A friend";
   const url=SHARE_URL+"?c="+G.seedBase+"."+G.score+"."+encodeURIComponent(name);
@@ -1908,7 +1912,7 @@ function hud(){
 function circBtn(x,y,t,a){ctx.save();ctx.globalAlpha=a;const g=ctx.createLinearGradient(0,y-36,0,y+36);g.addColorStop(0,"rgba(255,255,255,.3)");g.addColorStop(1,"rgba(255,255,255,.07)");
   ctx.fillStyle=g;ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,38,0,6.3);ctx.fill();ctx.stroke();
   ctx.fillStyle="#fff";ctx.font="800 36px 'Segoe UI',system-ui,sans-serif";ctx.fillText(t,x,y+2);ctx.restore()}
-refreshWorlds();applyQ();const BUILD="2026-10-16 b33";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
+refreshWorlds();applyQ();const BUILD="2026-10-16 b34";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
 {let taps=0,tt=0;$("verTag").style.cssText+=";padding:8px 14px;cursor:pointer";$("verTag").onclick=()=>{const n=Date.now();if(n-tt>4000)taps=0;tt=n;taps++;if(taps>=7){taps=0;TESTER=!TESTER;store("hz_tester",TESTER?"1":"0");refreshWorlds();verTxt();refreshMenu();toast(TESTER?"Tester mode ON: unlimited boosters (scores won't count for leaderboards)":"Tester mode OFF")}}}
 let SITE_TAG=null;function siteTag(){return fetch(location.pathname,{cache:"no-cache",method:"HEAD"}).then(r=>(r.headers.get("etag")||"")+(r.headers.get("last-modified")||"")).catch(()=>null)}
 siteTag().then(t=>{SITE_TAG=t});

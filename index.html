@@ -1390,7 +1390,7 @@ function tipFor(c){
   if(ix<=4)return"Look for glowing lines on the board. They're all one color so far. Add matching pieces to finish a PURE line!";
   if(c.stones&&ix<=9)return"New: gray STONES! A line with a stone can't be Pure, but it still clears. Plan your Pure lines in stone-free rows and columns.";
   return"Keep each line ONE color. Glowing lines and the star on a piece show where a Pure clear is close.";}
-const SHARE_URL="https://dherrington63026-jpg.github.io/"; // change to huezel.com if we buy it
+const SHARE_URL="https://huezel.com/"; // huezel.com live since 2026-10-16 (old address still works)
 let skipIntro=false;
 function showIntro(){if(skipIntro){skipIntro=false;return}
   if(G.chal){$("inKind").textContent="Friend challenge";$("inGoal").textContent=G.chal.name+" scored "+G.chal.score.toLocaleString();$("inChips").innerHTML='<span class="chip" style="cursor:default">same pieces for both of you</span>';

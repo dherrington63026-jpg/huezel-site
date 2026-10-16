@@ -1,0 +1,66 @@
+{
+  "name": "Huezel - Color Block Puzzle",
+  "short_name": "Huezel",
+  "description": "Glossy color block puzzle with Pure clears, guided stages, a weekly challenge, and no ads while you play.",
+  "id": "/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0820",
+  "theme_color": "#0b0820",
+  "categories": [
+    "games",
+    "puzzle"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "lang": "en-US",
+  "dir": "ltr",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "screenshots/s1.jpg",
+      "sizes": "540x960",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Pure clear"
+    },
+    {
+      "src": "screenshots/s2.jpg",
+      "sizes": "540x960",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Guided lines"
+    },
+    {
+      "src": "screenshots/s3.jpg",
+      "sizes": "540x960",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Weekly challenge"
+    }
+  ]
+}

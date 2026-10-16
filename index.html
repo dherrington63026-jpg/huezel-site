@@ -1382,6 +1382,12 @@ function tipFor(c){
   if(c.kind==="daily")return"Smash the "+DESIGNS[c.design].name.toLowerCase()+"! The picture is made of colored blocks. Fill lines to clear it, and make PURE lines to blow up touching blocks of the same color. Same puzzle for everyone, all week.";
   const ix=c.idx||c.n;
   if(c.world>1&&c.lw===1)return WORLDS[c.world-1].tip;
+  {let seen={};try{seen=JSON.parse(store("hz_newtip")||"{}")||{}}catch(e){}
+   const NT=[["rainbow",c.rainbow,"New: RAINBOW blocks! A rainbow block counts as ANY color, so it never ruins a Pure line. Use it to finish lines, and to make Pure lines easier!"],
+    ["stone",c.stones,"New: gray STONES! A line with a stone can't be Pure, but it still clears. Plan your Pure lines in stone-free rows and columns."],
+    ["bomb",c.bombs,"New: BOMBS! When a line with a bomb clears, it explodes and breaks every block around it."],
+    ["ice",c.ice,"New: ICE blocks! A line through ice only cracks it. Clear a second line through it to break it for good. Ice stops Pure lines until it is gone."]];
+   const hits=NT.filter(x=>x[1]>0&&!seen[x[0]]).slice(0,2);if(hits.length){hits.forEach(x=>seen[x[0]]=1);store("hz_newtip",JSON.stringify(seen));return hits.map(x=>x[2]).join("  ")}}
   if(c.rainbow&&ix>=8&&ix<=9)return"New: RAINBOW blocks! A rainbow block counts as ANY color, so it never ruins a Pure line. Use it to finish lines!";
   if(c.ice&&ix>=18&&ix<=19)return"New: ICE blocks! A line through ice only cracks it. Clear a second line through it to break it for good. Ice stops Pure lines until it is gone.";
   if(c.bombs&&ix>=12&&ix<=13)return"New: BOMBS! When a line with a bomb clears, it explodes and breaks every block around it.";
@@ -1902,7 +1908,7 @@ function hud(){
 function circBtn(x,y,t,a){ctx.save();ctx.globalAlpha=a;const g=ctx.createLinearGradient(0,y-36,0,y+36);g.addColorStop(0,"rgba(255,255,255,.3)");g.addColorStop(1,"rgba(255,255,255,.07)");
   ctx.fillStyle=g;ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,38,0,6.3);ctx.fill();ctx.stroke();
   ctx.fillStyle="#fff";ctx.font="800 36px 'Segoe UI',system-ui,sans-serif";ctx.fillText(t,x,y+2);ctx.restore()}
-refreshWorlds();applyQ();const BUILD="2026-10-16 b32";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
+refreshWorlds();applyQ();const BUILD="2026-10-16 b33";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
 {let taps=0,tt=0;$("verTag").style.cssText+=";padding:8px 14px;cursor:pointer";$("verTag").onclick=()=>{const n=Date.now();if(n-tt>4000)taps=0;tt=n;taps++;if(taps>=7){taps=0;TESTER=!TESTER;store("hz_tester",TESTER?"1":"0");refreshWorlds();verTxt();refreshMenu();toast(TESTER?"Tester mode ON: unlimited boosters (scores won't count for leaderboards)":"Tester mode OFF")}}}
 let SITE_TAG=null;function siteTag(){return fetch(location.pathname,{cache:"no-cache",method:"HEAD"}).then(r=>(r.headers.get("etag")||"")+(r.headers.get("last-modified")||"")).catch(()=>null)}
 siteTag().then(t=>{SITE_TAG=t});

@@ -1554,11 +1554,11 @@ $("nameIn").value=store("hz_name")||"";syncOpts();refreshMenu();
 function toL(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left-OX)/VS,(e.clientY-r.top-OY)/VS]}
 function pieceRect(p){const[sx,sy]=slotCenter(p.slot);return{x:sx-120,y:sy-118,w:240,h:236}}
 cv.addEventListener("pointerdown",e=>{audio();if(state!=="play"||G.over||G.drag||G.offer)return;const[x,y]=toL(e);
-  if(btutOn()&&x>=18&&x<=128&&y>=118&&y<=154){btutSeen(G.btut.k);G.btut=null;G.tgt=null;toast("Lesson skipped");return}
-  if(G.tut&&x>=18&&x<=128&&y>=118&&y<=154){store("hz_tut_done","1");G.tut=null;toast("Tutorial skipped");return}
+  if(btutOn()&&x>=14&&x<=200&&y>=116&&y<=176){btutSeen(G.btut.k);G.btut=null;G.tgt=null;toast("Lesson skipped");return}
+  if(G.tut&&x>=14&&x<=200&&y>=116&&y<=176){store("hz_tut_done","1");G.tut=null;toast("Tutorial skipped");return}
   if(Math.hypot(x-60,y-70)<44){if(G.mode==="stage"){openMap()}else{state="menu";show("menu");refreshMenu()}return}
   if((G.cfg.kind==="stage"||G.cfg.kind==="daily")&&x>=590&&x<=700&&y>=30&&y<=112){const pr=parFor(G.cfg);toast("★★★ = "+pr+" pieces or fewer · ★★ = "+Math.floor(pr*1.5)+" or fewer");return}
-  if(!noBoost())for(let i=0;i<BOOSTS.length;i++){const[bx,by]=boostPos(i);if(Math.hypot(x-bx,y-by)<44){if(btutOn()&&BOOSTS[i].k!==G.btut.k){toast("Try the glowing booster first!");return}boostTap(BOOSTS[i].k);return}}
+  if(!noBoost())for(let i=0;i<BOOSTS.length;i++){const[bx,by]=boostPos(i);if(Math.hypot(x-bx,y-by)<54){if(btutOn()&&BOOSTS[i].k!==G.btut.k){toast("Try the glowing booster first!");return}boostTap(BOOSTS[i].k);return}}
   if(G.tgt){targetTap(x,y);return}
   if(btutOn()){toast("Tap the glowing booster to learn it");return}
   for(const p of G.pieces){if(p.used)continue;const r=pieceRect(p);if(x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h){
@@ -1788,7 +1788,7 @@ function targetOverlay(){const t=G.tgt;if(!t)return;
 function tutorialDraw(){const T=G.tut;if(!T||state!=="play"||G.over)return;
   const cap=(msg,col)=>{ctx.save();ctx.font="900 30px 'Segoe UI',system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.lineWidth=7;ctx.strokeStyle="rgba(20,8,60,.9)";ctx.lineJoin="round";ctx.strokeText(msg,LW/2,BY+N*CELL+44);ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=SBQ*(14);ctx.fillText(msg,LW/2,BY+N*CELL+44);ctx.restore()};
   // skip pill
-  ctx.save();ctx.fillStyle="rgba(10,6,40,.6)";rr(18,118,110,36,18);ctx.fill();ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;rr(18,118,110,36,18);ctx.stroke();ctx.fillStyle="rgba(255,255,255,.85)";ctx.font="800 18px 'Segoe UI',system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("Skip tutorial",73,137);ctx.restore();
+  ctx.save();ctx.fillStyle="rgba(20,10,70,.95)";rr(18,120,176,52,26);ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=3;rr(18,120,176,52,26);ctx.stroke();ctx.fillStyle="#fff";ctx.font="900 25px 'Segoe UI',system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("Skip tutorial",106,147);ctx.restore();
   if(T.step===0){if(T.hk!==G.placed){T.hk=G.placed;T.hint=findHint()}const h=T.hint;if(!h||G.drag){cap("Drag the shape onto the grid","#ffffff");return}
     const pu=.5+.5*Math.sin(bgT*8);h.p.s.cells.forEach(([i,j])=>{const[x,y]=cellXY(h.r+i,h.c+j);ctx.save();ctx.strokeStyle="rgba(255,226,122,"+(.5+.4*pu)+")";ctx.lineWidth=5;ctx.shadowColor="#ffd96a";ctx.shadowBlur=SBQ*(18);rr(x+4,y+4,CELL-8,CELL-8,16);ctx.stroke();ctx.restore()});
     const[sx,sy]=slotCenter(h.p.slot),ex=BX+(h.c+h.p.s.w/2)*CELL,ey=BY+(h.r+h.p.s.h/2)*CELL,ph=(T.t%2.2)/1.6,u=Math.min(1,ph),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,hx=sx+(ex-sx)*e,hy=sy+(ey-sy)*e;
@@ -1810,7 +1810,7 @@ function btutDraw(){const B=G.btut;if(!B||!B.armed||state!=="play"||G.over)retur
   const cellRing=(r,c)=>{const[x,y]=cellXY(r,c);ringAt(x+CELL/2,y+CELL/2,CELL/2-3,1);hand(x+CELL/2,y+CELL/2,1)};
   const mid=(a,b2)=>Math.hypot(a-(N-1)/2,b2-(N-1)/2);
   // skip pill
-  if(!B.done){ctx.save();ctx.fillStyle="rgba(10,6,40,.6)";rr(18,118,110,36,18);ctx.fill();ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;rr(18,118,110,36,18);ctx.stroke();ctx.fillStyle="rgba(255,255,255,.85)";ctx.font="800 18px "+F;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("Skip lesson",73,137);ctx.restore()}
+  if(!B.done){ctx.save();ctx.fillStyle="rgba(20,10,70,.95)";rr(18,120,176,52,26);ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=3;rr(18,120,176,52,26);ctx.stroke();ctx.fillStyle="#fff";ctx.font="900 25px "+F;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("Skip lesson",106,147);ctx.restore()}
   if(B.done){cap("Nice! "+bd.icon+" "+bd.name+" is yours","Earn more by clearing stages, or find packs in the Shop");return}
   const bx=boostPos(bi)[0],by=boostPos(bi)[1];
   const pick=pred=>btutCells(pred).sort((a,b2)=>mid(a[0],a[1])-mid(b2[0],b2[1]))[0];
@@ -1912,7 +1912,7 @@ function hud(){
 function circBtn(x,y,t,a){ctx.save();ctx.globalAlpha=a;const g=ctx.createLinearGradient(0,y-36,0,y+36);g.addColorStop(0,"rgba(255,255,255,.3)");g.addColorStop(1,"rgba(255,255,255,.07)");
   ctx.fillStyle=g;ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,38,0,6.3);ctx.fill();ctx.stroke();
   ctx.fillStyle="#fff";ctx.font="800 36px 'Segoe UI',system-ui,sans-serif";ctx.fillText(t,x,y+2);ctx.restore()}
-refreshWorlds();applyQ();const BUILD="2026-10-16 b34";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
+refreshWorlds();applyQ();const BUILD="2026-10-16 b35";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
 {let taps=0,tt=0;$("verTag").style.cssText+=";padding:8px 14px;cursor:pointer";$("verTag").onclick=()=>{const n=Date.now();if(n-tt>4000)taps=0;tt=n;taps++;if(taps>=7){taps=0;TESTER=!TESTER;store("hz_tester",TESTER?"1":"0");refreshWorlds();verTxt();refreshMenu();toast(TESTER?"Tester mode ON: unlimited boosters (scores won't count for leaderboards)":"Tester mode OFF")}}}
 let SITE_TAG=null;function siteTag(){return fetch(location.pathname,{cache:"no-cache",method:"HEAD"}).then(r=>(r.headers.get("etag")||"")+(r.headers.get("last-modified")||"")).catch(()=>null)}
 siteTag().then(t=>{SITE_TAG=t});

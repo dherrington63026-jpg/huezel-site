@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.kelbra.huezel",
+        "sha256_cert_fingerprints": ["D8:77:CA:20:08:C6:73:AE:E4:69:16:62:4D:A7:CC:E6:D7:08:EE:DA:3A:91:00:6E:59:4E:4D:12:5F:92:F3:7A"]
+      }
+    }]

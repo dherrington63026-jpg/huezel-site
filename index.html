@@ -1162,7 +1162,8 @@ function btutReady(k){if(k==="rewind")return !!G.undo;if(k==="shuffle")return G.
   if(k==="paint")return btutCells(v=>v!==5&&v<9).length>0;if(k==="hammer"||k==="bomb")return btutCells(()=>true).length>0;
   if(k==="rainbow"){for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(waveValid(r,c).some(Boolean))return true;return false}return false}
 function btutOn(){return G&&G.btut&&G.btut.armed&&!G.btut.done}
-let TESTER=false;try{TESTER=localStorage.getItem("hz_tester")==="1"}catch(e){}
+const REAL_STORE=STORE_LIVE||typeof window.getDigitalGoodsService==="function"; // in the iPhone/Android store apps tester mode is OFF: it would give free "purchases"
+let TESTER=false;try{TESTER=!REAL_STORE&&localStorage.getItem("hz_tester")==="1"}catch(e){}
 (function(){try{BO=JSON.parse(store("hz_boost")||"null")}catch(e){}if(!BO){BO={paint:0,hammer:0,shuffle:0,rewind:0,rainbow:0,bomb:0};store("hz_boost",JSON.stringify(BO))}else if(BO.rainbow===undefined||BO.bomb===undefined){BO.rainbow=BO.rainbow===undefined?1:BO.rainbow;BO.bomb=BO.bomb===undefined?1:BO.bomb;NEWBOOST=true;store("hz_boost",JSON.stringify(BO))}})();
 function saveBoost(){store("hz_boost",JSON.stringify(BO))}
 function addBoost(k,n=1){BO[k]=Math.min(9,(BO[k]||0)+n);saveBoost()}
@@ -1912,8 +1913,8 @@ function hud(){
 function circBtn(x,y,t,a){ctx.save();ctx.globalAlpha=a;const g=ctx.createLinearGradient(0,y-36,0,y+36);g.addColorStop(0,"rgba(255,255,255,.3)");g.addColorStop(1,"rgba(255,255,255,.07)");
   ctx.fillStyle=g;ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,38,0,6.3);ctx.fill();ctx.stroke();
   ctx.fillStyle="#fff";ctx.font="800 36px 'Segoe UI',system-ui,sans-serif";ctx.fillText(t,x,y+2);ctx.restore()}
-refreshWorlds();applyQ();const BUILD="2026-10-16 b35";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
-{let taps=0,tt=0;$("verTag").style.cssText+=";padding:8px 14px;cursor:pointer";$("verTag").onclick=()=>{const n=Date.now();if(n-tt>4000)taps=0;tt=n;taps++;if(taps>=7){taps=0;TESTER=!TESTER;store("hz_tester",TESTER?"1":"0");refreshWorlds();verTxt();refreshMenu();toast(TESTER?"Tester mode ON: unlimited boosters (scores won't count for leaderboards)":"Tester mode OFF")}}}
+refreshWorlds();applyQ();const BUILD="2026-10-20 b36";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
+{let taps=0,tt=0;$("verTag").style.cssText+=";padding:8px 14px;cursor:pointer";$("verTag").onclick=()=>{const n=Date.now();if(n-tt>4000)taps=0;tt=n;taps++;if(taps>=7){taps=0;if(REAL_STORE){toast("Tester mode is not available in the store app");return}TESTER=!TESTER;store("hz_tester",TESTER?"1":"0");refreshWorlds();verTxt();refreshMenu();toast(TESTER?"Tester mode ON: unlimited boosters (scores won't count for leaderboards)":"Tester mode OFF")}}}
 let SITE_TAG=null;function siteTag(){return fetch(location.pathname,{cache:"no-cache",method:"HEAD"}).then(r=>(r.headers.get("etag")||"")+(r.headers.get("last-modified")||"")).catch(()=>null)}
 siteTag().then(t=>{SITE_TAG=t});
 document.addEventListener("visibilitychange",()=>{if(document.hidden||state==="play")return;siteTag().then(t=>{if(t&&SITE_TAG&&t!==SITE_TAG){toast("New update! Reloading...");setTimeout(()=>location.reload(),900)}})});

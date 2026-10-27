@@ -98,6 +98,7 @@
   <button class="btn hot" id="bStage">JOURNEY<small id="stageSub">level 1</small></button>
   <button class="btn gold" id="bDaily">WEEKLY CHALLENGE<small id="dailySub">very hard · new every week</small></button>
   <button class="btn" id="bClassic">CLASSIC<small>endless, chase your best</small></button>
+  <button class="btn" id="bShop" style="background:linear-gradient(180deg,#7ee8ff,#4c8dff 55%,#2a4fd6);border-color:#c8f2ff;color:#fff">🛍 SHOP<small>skins, boosters, themes</small></button>
   <input class="name" id="nameIn" maxlength="14" placeholder="Your name (shown when you share)">
   <div id="menuBoost"></div>
   <div class="row">
@@ -111,7 +112,7 @@
   </div>
   <div id="verTag" style="opacity:.45;font-size:11px;font-weight:700"></div>
   <div id="iosTip" style="display:none;max-width:320px;font-size:13px;font-weight:700;line-height:1.4;color:#ffe9a8;background:rgba(255,200,60,.12);border:1px solid rgba(255,226,122,.5);border-radius:14px;padding:8px 12px">Tip: tap Share, then Add to Home Screen, and play from the icon. Safari can erase saved progress from a web page!</div>
-  <div class="row"><button class="chip" id="bLb" style="border-color:#7affd1;color:#c8fff0">🥇 Leaderboards</button><button class="chip" id="bAch" style="border-color:#ffd96a;color:#ffe9a8">🏆 Trophies</button><button class="chip" id="bShop" style="border-color:#7ee8ff;color:#c8f2ff">🛍 Shop</button><button class="chip" id="bMis" style="border-color:#ffd96a;color:#ffe9a8">✨ Missions</button></div>
+  <div class="row"><button class="chip" id="bLb" style="border-color:#7affd1;color:#c8fff0">🥇 Leaderboards</button><button class="chip" id="bAch" style="border-color:#ffd96a;color:#ffe9a8">🏆 Trophies</button><button class="chip" id="bMis" style="border-color:#ffd96a;color:#ffe9a8">✨ Missions</button></div>
   <div class="row"><button class="chip" id="bStats">📊 Stats</button><button class="chip" id="bHow">How to play</button><button class="chip" id="bSave">Save / restore progress</button></div>
 </div>
 
@@ -1060,14 +1061,15 @@ function deliverTx(t){if(!t||!t.transactionId||!t.productIdentifier)return false
     async restore(){try{await NP.restorePurchases();const r=await NP.getPurchases({productType:"inapp"});let n=0;(r.purchases||[]).forEach(t=>{const pid=String(t.productIdentifier||"").replace(PID_PREFIX,"");const P=PRODUCTS[pid];if(P&&P.once&&!purchased().includes(pid)){txMark(String(t.transactionId));grantProduct(pid);n++}});return n}catch(e){return -1}}};
   Store.native=N;N.init()})();
 /* ---- Google Play billing inside the Android app (Trusted Web Activity: Digital Goods API + Payment Request) ---- */
-(function(){if(Store.native||typeof window.getDigitalGoodsService!=="function")return;
+const sdSet=t=>{window.__sd=t;try{verTxt()}catch(e){}};
+(function(){if(Store.native)return;if(typeof window.getDigitalGoodsService!=="function"){sdSet("no Play billing in this app");return}
   const GP="https://play.google.com/billing";
   const N={prods:{},ready:false,svc:null,
     async finish(pid,token){try{if(PRODUCTS[pid]&&PRODUCTS[pid].once)await N.svc.acknowledge(token,"onetime");else await N.svc.consume(token)}catch(e){}},
     async sync(){try{const list=await N.svc.listPurchases();let n=0;for(const p of list||[]){const pid=String(p.itemId||"").replace(PID_PREFIX,"");if(!PRODUCTS[pid])continue;
         if(deliverTx({transactionId:p.purchaseToken,productIdentifier:p.itemId}))n++;await N.finish(pid,p.purchaseToken)}return n}catch(e){return -1}},
-    async init(){try{N.svc=await window.getDigitalGoodsService(GP);const d=await N.svc.getDetails(Object.keys(PRODUCTS).map(k=>PID_PREFIX+k));
-        (d||[]).forEach(p=>{N.prods[String(p.itemId).replace(PID_PREFIX,"")]=p});N.ready=Object.keys(N.prods).length>0;if(N.ready){await N.sync()}refreshMenu();if($("shopScr").classList.contains("show"))renderShop()}catch(e){}},
+    async init(){try{sdSet("connecting");N.svc=await window.getDigitalGoodsService(GP);const d=await N.svc.getDetails(Object.keys(PRODUCTS).map(k=>PID_PREFIX+k));
+        (d||[]).forEach(p=>{N.prods[String(p.itemId).replace(PID_PREFIX,"")]=p});N.ready=Object.keys(N.prods).length>0;sdSet(N.ready?"connected, "+Object.keys(N.prods).length+" items":"connected, 0 items found");if(N.ready){await N.sync()}refreshMenu();if($("shopScr").classList.contains("show"))renderShop()}catch(e){sdSet("error: "+String((e&&e.message)||e).slice(0,60))}},
     priceOf(pid){const p=N.prods[pid];if(!p||!p.price)return null;try{return new Intl.NumberFormat(undefined,{style:"currency",currency:p.price.currency}).format(+p.price.value)}catch(e){return p.price.value+" "+p.price.currency}},
     async buy(pid){if(!N.prods[pid]||!N.svc)return false;let resp=null;
       try{const req=new PaymentRequest([{supportedMethods:GP,data:{sku:PID_PREFIX+pid}}],{total:{label:"Total",amount:{currency:"USD",value:"0"}}});resp=await req.show()}catch(e){return false}
@@ -1913,7 +1915,7 @@ function hud(){
 function circBtn(x,y,t,a){ctx.save();ctx.globalAlpha=a;const g=ctx.createLinearGradient(0,y-36,0,y+36);g.addColorStop(0,"rgba(255,255,255,.3)");g.addColorStop(1,"rgba(255,255,255,.07)");
   ctx.fillStyle=g;ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,38,0,6.3);ctx.fill();ctx.stroke();
   ctx.fillStyle="#fff";ctx.font="800 36px 'Segoe UI',system-ui,sans-serif";ctx.fillText(t,x,y+2);ctx.restore()}
-refreshWorlds();applyQ();const BUILD="2026-10-20 b36";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")};verTxt();
+refreshWorlds();applyQ();const BUILD="2026-10-27 b37";const verTxt=()=>{$("verTag").textContent="Huezel build "+BUILD+(TESTER?" · TESTER MODE (unlimited boosters)":"")+(window.__sd?" · store: "+window.__sd:"")};verTxt();
 {let taps=0,tt=0;$("verTag").style.cssText+=";padding:8px 14px;cursor:pointer";$("verTag").onclick=()=>{const n=Date.now();if(n-tt>4000)taps=0;tt=n;taps++;if(taps>=7){taps=0;if(REAL_STORE){toast("Tester mode is not available in the store app");return}TESTER=!TESTER;store("hz_tester",TESTER?"1":"0");refreshWorlds();verTxt();refreshMenu();toast(TESTER?"Tester mode ON: unlimited boosters (scores won't count for leaderboards)":"Tester mode OFF")}}}
 let SITE_TAG=null;function siteTag(){return fetch(location.pathname,{cache:"no-cache",method:"HEAD"}).then(r=>(r.headers.get("etag")||"")+(r.headers.get("last-modified")||"")).catch(()=>null)}
 siteTag().then(t=>{SITE_TAG=t});
